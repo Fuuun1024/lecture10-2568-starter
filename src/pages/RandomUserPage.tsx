@@ -1,13 +1,21 @@
 import { UserCard } from "../components/UserCard";
 import { cleanUser } from "../libs/CleanUser";
 import axios from "axios";
-import { useState } from "react";
+import { use, useState } from "react";
 export default function RandomUserPage() {
   const [users, setUsers] = useState<any>([]);
+  const [isLoading, setIsLoading] = useState(false); 
 
   const generateBtnOnClick = async () => {
+    setIsLoading(true);
     const resp = await axios.get(`https://randomuser.me/api`);
+    
     const users = resp.data.results[0];
+    const cleanedUser = cleanUser(users);
+    //console.log(users);
+    //console.log(cleanedUser);
+    setUsers(cleanedUser);
+    setIsLoading(false);
   };
 
   return (
@@ -18,7 +26,15 @@ export default function RandomUserPage() {
           Generate
         </button>
       </div>
-      {/* <p className="display-6 text-center fst-italic my-4">Loading ...</p> */}
+      {isLoading && (
+      <p className="display-6 text-center fst-italic my-4">Loading ...</p>
+      )}
+      {!isLoading && users && ( <UserCard 
+        name = {users.name} 
+        imgUrl = {users.imgUrl} 
+        address = {users.address} 
+        email = {users.email}/>
+        )}
     </div>
   );
 }
